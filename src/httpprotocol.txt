@@ -1,0 +1,92 @@
+token = timestamp + accountname
+use AES to encrypt, key = MACaddress
+
+
+errorcode:
+-2: http failure
+-1: connection failure
+0: no problem
+1: authentication failure
+2: server side error (need to be more specific in future)
+3: block relate error (block not found)
+4: server exception error (need to check server status & log)
+5: file relate error
+6: deletefile fail
+7: lock error
+8: lock not locked
+9: token out of date
+19: account is already registered
+20: exception failure (see exception log)
+40: New file created but no blocks needs to be transfer
+
+
+/*login related zone*/
+/createaccount
+	POST {'account' | 'password' | 'MAC'}
+	server return {'token' | 'succ' | 'errorcode'}
+
+/login
+    POST {'account'  | 'password' | 'MAC' }
+    server return {'token' | 'succ' | 'errorcode'}
+
+/*file related zone*/
+
+/newfile
+	POST {'token'|'MAC'|'filename' | 'MD5'}
+	server return {'succ' | 'errorcode'}
+	
+/deletefile
+	POST {'token' | 'MAC' | 'filename'}
+	server return {'succ' | 'errorcode'}
+	
+/modifyfile
+	POST {'token'|'MAC'|'filename' | 'newMD5'}
+	server return {'succ' | 'errorcode'}
+
+/syncrequest
+   POST {'token','MAC'}
+   server return {'filelist':[array of record pair]| 'succ'| 'errorcode'}    //self define datastructure that contains record pair ['filename', 'filemd5']
+
+/*block related zone*/
+
+/getblockrecord
+    POST {'token','MAC','filename'}
+    server return {'blocklist' : [array of BlockRec] | 'succ'| 'errorcode'}     // record of that file, contains 'block md5' and it is stored in order
+    
+/getblock
+    POST {'token'|'MAC'|'blockname'| 'seq'}
+    server return {'succ'|'data'|'errorcode'}
+
+/postblock
+    POST {'token' |'MAC'| 'blockdata'|'filename'|'seq'}
+    server return {'succ'| 'errorcode'}
+	
+/deleteblock
+	POST {'token' |'MAC'| 'blockname'|'filename'}
+    server return {'succ'| 'errorcode'}
+
+/*sharelink related zone*/
+
+/generateURL
+    POST {'token' | 'MAC'|'filename'}
+    server return {'URL'|'succ'| 'errorcode'}
+
+/generateFile           <- this is the response action of URL given in generateURL
+    POST {'token' | 'MAC' | 'account'|'filename'}
+    server return {'data'|'succ'| 'errorcode'}
+
+/*server lock machanism relate zone*/
+
+/getserverlock
+    POST {'token'|'MAC'}
+    server return {'succ' | 'errorcode'}
+
+/releaseserverlock
+    POST {'token'|'MAC'}
+    server return {'succ'| 'errorcode'}
+
+/*ultility zone*/
+
+/networkcheck
+    GET
+    server return "success"
