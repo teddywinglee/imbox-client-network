@@ -16,7 +16,7 @@ import org.json.JSONObject;
 
 public class Simpleconnection 
 {
-	private String URL = "http://54.254.1.241:8080";//base domain  real : 54.254.1.241
+	private String URL = "http://127.0.0.1:8080";//base domain  real : 54.254.1.241
 	private HttpClient connectionmanager;
 	
 	public Simpleconnection()
